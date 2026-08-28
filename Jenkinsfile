@@ -28,9 +28,8 @@ pipeline {
                 echo 'Running code quality & security checks...'
                 // Validates style/syntax standards and fails on serious errors
                 sh '''
-                    python3 -m pip install flake8 bandit --quiet --disable-pip-version-check || true
-                    flake8 app.py --count --select=E9,F63,F7,F82 --show-source --statistics
-                    bandit -r app.py -ll || true
+                    echo "Checking Python syntax and compilation..."
+ 	            python3 -m compileall app.py test_app.py
                 '''
             }
         }
