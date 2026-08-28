@@ -43,7 +43,23 @@ pipeline {
             echo ' Pipeline completed successfully.'
         }
         failure {
-            echo ' Pipeline failed! Check the console logs for root-cause diagnosis.'
+		sh '''
+            		cat << 'EOF' > parse_error.py
+	import re
+
+	with open("console.log", "r", errors="ignore") as f:
+    	logs = f.read()
+
+	# Pattern-match common build/test failure signals
+	errors = re.findall(r"(AssertionError:.*|SyntaxError:.*|ERROR:.*)", logs)
+	print("=== AI Root Cause Suggestion ===")	
+	if errors:
+    		print(f"Detected Error: {errors[-1]}")
+    		print("Actionable Fix: Verify unit test assertion expectations against the module return values.")
+	else:
+    		print("Unrecognized crash signature. Review full pipeline trace.")
+	EOF
+            python3 parse_error.py || true
+        '''
         }
     }
-}
